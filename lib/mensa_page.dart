@@ -1,14 +1,12 @@
+import 'package:common_ui/common_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:meal_ports/meal_ports.dart';
-import 'package:mensa/collection_item.dart';
 import 'package:mensa/mappings.dart';
 import 'package:mensa/meal_query_dto.dart';
 import 'package:mensa/settings_page.dart';
 import 'package:open_mensa_meal_adapters/open_mensa_meal_adapters.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'collection_view_model.dart';
 
 class MensaPage extends StatefulWidget {
   const MensaPage({Key? key}) : super(key: key);
@@ -20,7 +18,8 @@ class MensaPage extends StatefulWidget {
 class _MensaPageState extends State<MensaPage> {
   final logger = Logger();
   var command = OpenMensaGetMealsCommand();
-  List<CollectionViewModel> collections = [];
+
+  List<ListSection> sections = [];
   late SharedPreferences prefs;
   int status = 0;
 
@@ -44,8 +43,8 @@ class _MensaPageState extends State<MensaPage> {
     return SafeArea(
         child: ListView.builder(
       itemBuilder: (BuildContext context, int index) =>
-          CollectionItem(collections[index]),
-      itemCount: collections.length,
+          SectionTile(section: sections[index]),
+      itemCount: sections.length,
     ));
   }
 
@@ -53,8 +52,8 @@ class _MensaPageState extends State<MensaPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var status = prefs.getInt(statusKey) ?? 0;
     setState(() {
-      this.collections = collections
-          .map((collection) => collection.toCollectionViewModel(status))
+      sections = collections
+          .map((collection) => collection.toListSection(status))
           .toList();
     });
   }
